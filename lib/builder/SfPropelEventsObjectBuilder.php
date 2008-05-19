@@ -292,6 +292,7 @@ EOF;
     \$event = sfContext::getInstance()->getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.init_fk_coll', array(
       'related_class'     => '{$this->getRefFKPhpNameAffix($refFK, $plural = false)}',
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
+      'last_criteria'     => \$this->{$this->getRefFKLastCriteriaVarName($refFK)},
       'modified_columns'  => \$this->modifiedColumns,
     )));
     if (\$event->isProcessed() && is_array(\$event->getReturnValue()))
@@ -330,6 +331,7 @@ EOF;
       'related_class'     => '{$this->getRefFKPhpNameAffix($refFK, $plural = false)}',
       'added_value'       => \$l,
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
+      'last_criteria'     => \$this->{$this->getRefFKLastCriteriaVarName($refFK)},
       'modified_columns'  => \$this->modifiedColumns,
     )));
     if (\$event->isProcessed() && \$event->getReturnValue())

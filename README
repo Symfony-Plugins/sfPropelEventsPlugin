@@ -1,0 +1,276 @@
+= sfPropelEventsPlugin =
+
+Adds a number of symfony 1.1 events to your Propel objects.
+
+== Installation ==
+
+To download the plugin over the symfony PEAR channel:
+
+{{{
+$ ./symfony plugin:install sfPropelEventsPlugin
+}}}
+
+Update the `builder settings` section of your project's `propel.ini` file so these lines...
+
+{{{
+propel.builder.peer.class              = plugins.sfPropelPlugin.lib.propel.builder.SfPeerBuilder
+propel.builder.object.class            = plugins.sfPropelPlugin.lib.propel.builder.SfObjectBuilder
+}}}
+
+...become...
+
+{{{
+propel.builder.peer.class              = plugins.sfPropelEventsPlugin.lib.builder.SfPropelEventsPeerBuilder
+propel.builder.object.class            = plugins.sfPropelEventsPlugin.lib.builder.SfPropelEventsObjectBuilder
+}}}
+
+Also in `propel.ini`, make sure the `addBehaviors` directive is switched on:
+
+{{{
+propel.builder.addBehaviors = true
+}}}
+
+Now rebuild your model classes:
+
+{{{
+$ ./symfony propel:build-model
+}}}
+
+== Propel Events ==
+
+Once `propel.ini` is updated and the model rebuilt, the following events will have been added to your OM classes:
+
+ * `BaseXXX.pre_delete`
+ * `BaseXXX.post_delete`
+ * `BaseXXX.pre_save`
+ * `BaseXXX.post_save`
+ * `BaseXXX.method_not_found`
+ * `BaseXXX.set_fk`
+ * `BaseXXX.get_fk`
+ * `BaseXXX.init_fk_coll`
+ * `BaseXXX.add_fk`
+ * `BaseXXX.count_fks`
+ * `BaseXXX.get_fks`
+ * `BaseXXX.get_fks_join`
+
+== Dependencies ==
+
+This plugin requires symfony 1.1.
+
+== Maintainers ==
+
+Kris Wallsmith
+
+== Roadmap ==
+
+ * Peer events
+ * Backport to symfony 1.0
+
+== Changelog ==
+
+=== Version 0.1.0-alpha ===
+
+ * Initial release
+
+== Event Reference ==
+
+Each event will include a set of parameters specific to that event. Also, each event object will elicit different reactions from the object once it returns, depending on the return value set by your listener.
+
+=== `pre_delete` ===
+
+This `notifyUntil` event includes the following parameters:
+
+ * `connection`
+ * `modified_columns`
+
+If your listener sets a return value for the event that evaluates as true, the standard Propel delete routine will not run.
+
+{{{
+#!php
+<?php
+
+function listen_for_pre_delete(sfEvent $event)
+{
+  // this will prevent Propel from deleting the object from the database
+  $event->setReturnValue(true);
+  return true;
+}
+}}}
+
+=== `post_delete` ===
+
+This `notify` event includes the following parameters:
+
+ * `connection`
+ * `modified_columns`
+
+=== `pre_save` ===
+
+This `notifyUntil` event includes the following parameters:
+
+ * `connection`
+ * `modified_columns`
+
+If your listener gives the event an integer return value, the standard Propel save routing will not run.
+
+{{{
+#!php
+<?php
+
+function listen_for_pre_save(sfEvent $event)
+{
+  // this will prevent Propel from saving the object to the database
+  $event->setReturnValue(0);
+  return true;
+}
+}}}
+
+=== `post_save` ===
+
+This `notify` event includes the following parameters:
+
+ * `connection`
+ * `was_new` whether the object was new before being saved
+ * `affected_rows`
+ * `modified_columns` those columns marked as modifed before the object was saved
+
+=== `method_not_found` ===
+
+This `notifyUntil` event includes the following parameters:
+
+ * `method`
+ * `arguments`
+ * `modified_columns`
+
+{{{
+#!php
+<?php
+
+function listen_for_method_not_found(sfEvent $event)
+{
+  $parameters = $event->getParameters();
+  switch ($parameters['method'])
+  {
+    case 'getModifiedColumns':
+    $event->setReturnValue($parameters['modified_columns']);
+    return true;
+  }
+}
+}}}
+
+=== `set_fk` ===
+
+This `notifyUntil` event includes the following parameters:
+
+ * `column`
+ * `related_class`
+ * `old_value`
+ * `new_value`
+ * `modified_columns`
+
+If your listener gives the event a return value of `null` or an instance of the `related_class`, the return value will be stored to the object.
+
+{{{
+#!php
+<?php
+
+function listen_for_set_fk(sfEvent $event)
+{
+  // this prevents any object from being place in this FK
+  $event->setReturnValue(null);
+  return true;
+}
+}}}
+
+=== `get_fk` ===
+
+This `notifyUntil` event includes the following parameters:
+
+ * `connection`
+ * `column`
+ * `related_class`
+ * `in_object` The instance of `related_class` or `null` currently stored in the object
+ * `modified_columns`
+
+If your listener gives the event a return value of `null` or an instance of the `related_class`, the event's return value will be returned to the calling script.
+
+{{{
+#!php
+<?php
+
+function listen_for_get_fk(sfEvent $event)
+{
+  $parameters = $event->getParameters();
+  $class = $parameters['related_class'];
+  
+  $event->setReturnValue(new $class);
+  return true;
+}
+}}}
+
+=== `init_fk_coll` ===
+
+This `notifyUntil` event includes the following parameters:
+
+ * `related_class`
+ * `in_object` The current value of the internal FK collection
+ * `last_criteria` The last Criteria used to query this FK
+ * `modified_columns`
+
+If your listener gives the event an array return value, the object's internal collection will be initalized with that value.
+
+=== `add_fk` ===
+
+This `notifyUntil` event includes the following parameters:
+
+ * `related_class`
+ * `added_value`
+ * `in_object` The internal FK collection
+ * `last_criteria` The last Criteria used to query this FK
+ * `modified_columns`
+
+If your listener sets a return value for the event that evaluates as true, the standard Propel add routine will not run.
+
+=== `count_fks` ===
+
+This `notifyUntil` event includes the following parameters:
+
+ * `criteria`
+ * `distinct`
+ * `connection`
+ * `related_class`
+ * `in_object` The internal FK collection
+ * `last_criteria` The last Criteria used to query this FK
+ * `modified_columns`
+
+If your listener sets an integer return value for the event, this value will be returned to the calling script instead of Propel querying the database.
+
+=== `get_fks` ===
+
+This `notifyUntil` event includes the following parameters:
+
+ * `criteria`
+ * `connection`
+ * `related_class`
+ * `in_object` The internal FK collection
+ * `last_criteria` The last Criteria used to query this FK
+ * `modified_columns`
+
+If your listener sets an array return value for the event, this value will be returned to the calling script in place of Propel's default behavior.
+
+=== `get_fks_join` ===
+
+This `notifyUntil` event includes the following parameters:
+
+ * `criteria`
+ * `connection`
+ * `middle_class`
+ * `related_class`
+ * `in_object`
+ * `last_criteria`
+ * `modified_columns`
+
+If your listener sets an array return value for the event, this value will be returned to the calling script in place of Propel's default behavior.
+
+
+
