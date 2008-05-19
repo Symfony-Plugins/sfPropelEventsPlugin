@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Add events to Propel objects.
+ * Add events to Propel OM classes.
  * 
  * @package     sfPropelEventsPlugin
  * @subpackage  builder
