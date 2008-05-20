@@ -267,7 +267,7 @@ EOF;
       if (false !== $pos)
       {
         $pos = $pos + strpos(substr($tmp, $pos), '{') + 1;
-        $insert = sprintf($getFksJoin, $this->getFKPhpNameAffix($fk2, $plural = false));
+        $insert = sprintf($getFksJoin, $this->getForeignTable($fk2)->getPhpName());
         
         $tmp = substr($tmp, 0, $pos).$insert.substr($tmp, $pos);
       }
@@ -295,7 +295,7 @@ EOF;
     $initFkColl = <<<EOF
 
     \$event = sfPropelEvents::getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.init_fk_coll', array(
-      'related_class'     => '{$this->getRefFKPhpNameAffix($refFK, $plural = false)}',
+      'related_class'     => '{$refFK->getTable()->getPhpName()}',
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
       'last_criteria'     => \$this->{$this->getRefFKLastCriteriaVarName($refFK)},
       'modified_columns'  => \$this->modifiedColumns,
@@ -333,7 +333,7 @@ EOF;
     $addFk = <<<EOF
 
     \$event = sfPropelEvents::getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.add_fk', array(
-      'related_class'     => '{$this->getRefFKPhpNameAffix($refFK, $plural = false)}',
+      'related_class'     => '{$refFK->getTable()->getPhpName()}',
       'added_value'       => \$l,
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
       'last_criteria'     => \$this->{$this->getRefFKLastCriteriaVarName($refFK)},
@@ -374,7 +374,7 @@ EOF;
       'criteria'          => \$criteria,
       'distinct'          => \$distinct,
       'connection'        => \$con,
-      'related_class'     => '{$this->getRefFKPhpNameAffix($refFK, $plural = false)}',
+      'related_class'     => '{$refFK->getTable()->getPhpName()}',
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
       'last_criteria'     => \$this->{$this->getRefFKLastCriteriaVarName($refFK)},
       'modified_columns'  => \$this->modifiedColumns,
@@ -413,7 +413,7 @@ EOF;
     \$event = sfPropelEvents::getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.get_fks', array(
       'criteria'          => \$criteria,
       'connection'        => \$con,
-      'related_class'     => '{$this->getRefFKPhpNameAffix($refFK, $plural = false)}',
+      'related_class'     => '{$refFK->getTable()->getPhpName()}',
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
       'last_criteria'     => \$this->{$this->getRefFKLastCriteriaVarName($refFK)},
       'modified_columns'  => \$this->modifiedColumns,
