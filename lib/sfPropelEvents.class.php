@@ -11,8 +11,9 @@
 class sfPropelEvents
 {
   protected static
-    $dispatcher = null,
-    $behaviors  = array();
+    $dispatcher     = null,
+    $behaviors      = array(),
+    $addedBehaviors = array();
   
   /**
    * Add behaviors to a class.
@@ -40,10 +41,30 @@ class sfPropelEvents
           }
         }
       }
+      
+      // remember this class/behavior combo
+      if (!isset(self::$addedBehaviors[$class]))
+      {
+        self::$addedBehaviors[$class] = array();
+      }
+      self::$addedBehaviors[$class][] = $name;
     }
     
     // add to sfPropelBehavior
     sfPropelBehavior::add($class, $behaviors);
+  }
+  
+  /**
+   * Test whether a class has added an event behavior.
+   * 
+   * @param   string $class
+   * @param   string $behavior
+   * 
+   * @return  boolean
+   */
+  public static function hasBehavior($class, $behavior)
+  {
+    return isset(self::$addedBehaviors[$class]) && in_array($behavior, self::$addedBehaviors[$class]);
   }
   
   /**
