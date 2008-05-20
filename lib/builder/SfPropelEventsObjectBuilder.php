@@ -125,11 +125,33 @@ EOF;
     $tmp = '';
     parent::addCall($tmp);
     
+    $format = '\'%s\' => $this->%1$s';
+    
+    $collections = array();
+    $criteria = array();
+    foreach ($this->getTable()->getReferrers() as $refFK)
+    {
+      $collections[] = sprintf($format, $this->getRefFKCollVarName($refFK));
+      $criteria[] = sprintf($format, $this->getRefFKLastCriteriaVarName($refFK));
+    }
+    $collections = 'array('.join(', ', $collections).')';
+    $criteria = 'array('.join(', ', $criteria).')';
+    
+    $fkObjects = array();
+    foreach ($this->getTable()->getForeignKeys() as $fk)
+    {
+      $fkObjects[] = sprintf($format, $this->getFKVarName($fk));
+    }
+    $fkObjects = 'array('.join(', ', $fkObjects).')';
+    
     $call = <<<EOF
 
     \$event = sfPropelEvents::getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.method_not_found', array(
       'method'            => \$method,
       'arguments'         => \$arguments,
+      'fk_objects'        => $fkObjects,
+      'collections'       => $collections,
+      'last_criteria'     => $criteria,
       'modified_columns'  => \$this->modifiedColumns,
     )));
     if (\$event->isProcessed())
