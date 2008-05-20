@@ -1,7 +1,5 @@
 = sfPropelEventsPlugin =
 
-[[PageOutline]]
-
 Adds a number of symfony 1.1 events to your Propel objects (compatible with both symfony 1.0 and 1.1).
 
 == Installation ==
