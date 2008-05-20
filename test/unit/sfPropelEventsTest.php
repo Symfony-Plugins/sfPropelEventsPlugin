@@ -1,6 +1,6 @@
 <?php
 
-$nb = 40;
+$nb = 17;
 
 require dirname(__FILE__).'/../bootstrap/unit.php';
 

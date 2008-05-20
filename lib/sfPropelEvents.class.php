@@ -11,6 +11,7 @@
 class sfPropelEvents
 {
   protected static
+    $dispatcher = null,
     $behaviors  = array();
   
   /**
@@ -21,7 +22,6 @@ class sfPropelEvents
    */
   public static function addBehaviors($class, $behaviors)
   {
-    $dispatcher = sfContext::getInstance()->getEventDispatcher();
     foreach ($behaviors as $name => $parameters)
     {
       if (is_int($name))
@@ -34,15 +34,16 @@ class sfPropelEvents
       {
         foreach (self::$behaviors[$name] as $propelEvent => $listeners)
         {
-          $dispatcher->notify(new sfEvent(__CLASS__, 'application.log', array(sprintf('connecting "%s" behavior "%s" event for "%s" objects', $name, $propelEvent, $class))));
-          
           foreach ($listeners as $listener)
           {
-            $dispatcher->connect('Base'.$class.'.'.$propelEvent, $listener);
+            self::getEventDispatcher()->connect('Base'.$class.'.'.$propelEvent, $listener);
           }
         }
       }
     }
+    
+    // add to sfPropelBehavior
+    sfPropelBehavior::add($class, $behaviors);
   }
   
   /**
@@ -65,9 +66,6 @@ class sfPropelEvents
     
     foreach ($listeners as $propelEvent => $callables)
     {
-      sfContext::getInstance()->getEventDispatcher()->notify(
-        new sfEvent(__CLASS__, 'application.log', array(sprintf('registering listener for "%s" Propel event for "%s" behavior', $propelEvent, $name))));
-      
       if (!isset(self::$behaviors[$name][$propelEvent]))
       {
         self::$behaviors[$name][$propelEvent] = array();
@@ -85,5 +83,28 @@ class sfPropelEvents
    */
   public function sfPropelEventsEmptyFunction()
   {
+  }
+  
+  /**
+   * Get the event dispatcher.
+   * 
+   * @return  sfEventDispatcher
+   */
+  public static function getEventDispatcher()
+  {
+    if (is_null(self::$dispatcher))
+    {
+      $context = sfContext::getInstance();
+      if (method_exists($context, 'getEventDispatcher'))
+      {
+        self::$dispatcher = $context->getEventDispatcher();
+      }
+      else
+      {
+        self::$dispatcher = new sfEventDispatcher;
+      }
+    }
+    
+    return self::$dispatcher;
   }
 }

@@ -1,5 +1,10 @@
 <?php
 
+if (!class_exists('SfPeerBuilder'))
+{
+  require_once sfConfig::get('sf_symfony_lib_dir').'/addon/propel/builder/SfPeerBuilder.php';
+}
+
 /**
  * Add events to Propel peer classes.
  * 
@@ -24,18 +29,26 @@ class SfPropelEventsPeerBuilder extends SfPeerBuilder
     $behavior_file_path = $this->getFilePath($this->getStubObjectBuilder()->getPackage().'.om.'.$behavior_file_name);
     $absolute_behavior_file_path = sfConfig::get('sf_root_dir').'/'.$behavior_file_path;
     
-    $behaviors = $this->getTable()->getAttribute('behaviors');
-    if ($behaviors)
+    if (file_exists($absolute_behavior_file_path))
+    {
+      unlink($absolute_behavior_file_path);
+    }
+    
+    if ($behaviors = $this->getTable()->getAttribute('behaviors'))
     {
       $behaviors = var_export(unserialize($behaviors), true);
-      
       $addBehaviors = <<<EOF
+<?php
 
 sfPropelEvents::addBehaviors('{$this->getTable()->getPhpName()}', $behaviors);
 
 EOF;
+      file_put_contents($absolute_behavior_file_path, $addBehaviors);
       
-      file_put_contents($absolute_behavior_file_path, file_get_contents($absolute_behavior_file_path).$addBehaviors);
+      if (false === strpos($script, $behavior_file_path))
+      {
+        $script .= sprintf("\n\ninclude_once '%s';\n", $behavior_file_path);
+      }
     }
   }
 }

@@ -1,61 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.4.1" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
- <name>sfPropelEventsPlugin</name>
- <channel>pear.symfony-project.com</channel>
- <summary>Adds symfony 1.1 events to your Propel objects.</summary>
- <description>Adds symfony 1.1 events to your Propel objects.</description>
- <lead>
-  <name>Kris Wallsmith</name>
-  <user>Kris.Wallsmith</user>
-  <email>kris.wallsmith@gmail.com</email>
-  <active>yes</active>
- </lead>
- <date>2008-05-19</date>
- <version>
-   <release>0.1.0</release>
-   <api>0.1.0</api>
- </version>
- <stability>
-  <release>alpha</release>
-  <api>alpha</api>
- </stability>
- <license uri="http://www.symfony-project.com/license">MIT license</license>
- <notes>-</notes>
- <contents>
-   <dir name="/">
-     <dir name="lib">
-       <dir name="builder">
-         <file role="data" name="SfPropelEventsObjectBuilder.php" />
-         <file role="data" name="SfPropelEventsPeerBuilder.php" />
+<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.4.1" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+  <name>sfPropelEventsPlugin</name>
+  <channel>pear.symfony-project.com</channel>
+  <summary>Adds symfony 1.1 events to your Propel objects.</summary>
+  <description>Adds symfony 1.1 events to your Propel objects.</description>
+  <lead>
+    <name>Kris Wallsmith</name>
+    <user>Kris.Wallsmith</user>
+    <email>kris.wallsmith@gmail.com</email>
+    <active>yes</active>
+  </lead>
+  <date>2008-05-20</date>
+  <version>
+    <release>0.2.0</release>
+    <api>0.2.0</api>
+  </version>
+  <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+  </stability>
+  <license uri="http://www.symfony-project.com/license">MIT license</license>
+  <notes>-</notes>
+  <contents>
+    <dir name="/">
+      <dir name="lib">
+        <dir name="builder">
+          <file role="data" name="SfPropelEventsObjectBuilder.php"/>
+          <file role="data" name="SfPropelEventsPeerBuilder.php"/>
         </dir>
-       <file role="data" name="sfPropelEvents.class.php" />
-     </dir>
-     <file role="data" name="LICENSE"/>
-     <file role="data" name="README"/>
-   </dir>
- </contents>
-
- <dependencies>
-  <required>
-   <php>
-    <min>5.1.0</min>
-   </php>
-   <pearinstaller>
-    <min>1.4.1</min>
-   </pearinstaller>
-   <package>
-    <name>symfony</name>
-    <channel>pear.symfony-project.com</channel>
-    <min>1.1.0</min>
-    <max>1.2.0</max>
-    <exclude>1.2.0</exclude>
-   </package>
-  </required>
- </dependencies>
-
- <phprelease>
+        <file role="data" name="sfPropelEvents.class.php"/>
+        <dir name="event">
+          <file role="data" name="sfEvent.class.php"/>
+          <file role="data" name="sfEventDispatcher.class.php"/>
+        </dir>
+      </dir>
+      <file role="data" name="LICENSE"/>
+      <file role="data" name="README"/>
+    </dir>
+  </contents>
+  <dependencies>
+    <required>
+      <php>
+        <min>5.1.0</min>
+      </php>
+      <pearinstaller>
+        <min>1.4.1</min>
+      </pearinstaller>
+      <package>
+        <name>symfony</name>
+        <channel>pear.symfony-project.com</channel>
+        <min>1.0.0</min>
+        <max>1.2.0</max>
+        <exclude>1.2.0</exclude>
+      </package>
+    </required>
+  </dependencies>
+  <phprelease>
  </phprelease>
-
- <changelog>
+  <changelog>
  </changelog>
 </package>

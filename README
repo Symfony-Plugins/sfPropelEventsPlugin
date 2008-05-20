@@ -1,23 +1,18 @@
 = sfPropelEventsPlugin =
 
-Adds a number of symfony 1.1 events to your Propel objects.
+[[PageOutline]]
+
+Adds a number of symfony 1.1 events to your Propel objects (compatible with both symfony 1.0 and 1.1).
 
 == Installation ==
 
 To download the plugin over the symfony PEAR channel:
 
 {{{
-$ ./symfony plugin:install sfPropelEventsPlugin
+$ ./symfony plugin-install sfPropelEventsPlugin
 }}}
 
-Update the `builder settings` section of your project's `propel.ini` file so these lines...
-
-{{{
-propel.builder.peer.class              = plugins.sfPropelPlugin.lib.propel.builder.SfPeerBuilder
-propel.builder.object.class            = plugins.sfPropelPlugin.lib.propel.builder.SfObjectBuilder
-}}}
-
-...become...
+Update the following two directive in your project's `propel.ini` file:
 
 {{{
 propel.builder.peer.class              = plugins.sfPropelEventsPlugin.lib.builder.SfPropelEventsPeerBuilder
@@ -33,10 +28,10 @@ propel.builder.addBehaviors = true
 Now rebuild your model classes:
 
 {{{
-$ ./symfony propel:build-model
+$ ./symfony propel-build-model
 }}}
 
-== Propel Events ==
+== Propel events ==
 
 Once `propel.ini` is updated and the model rebuilt, the following events will have been added to your OM classes:
 
@@ -53,9 +48,80 @@ Once `propel.ini` is updated and the model rebuilt, the following events will ha
  * `BaseXXX.get_fks`
  * `BaseXXX.get_fks_join`
 
-== Dependencies ==
+== Creating event-based Propel behaviors ==
 
-This plugin requires symfony 1.1.
+All of these events can be utilized in Propel behaviors. For the purpose of this documentation let's assume you're creating a new symfony plugin. With the addition of Propel events, you can now register your behavior logic in three ways:
+
+ 1. `sfPropelBehavior::registerHooks()`
+ 2. `sfPropelBehavior::registerMethods()`
+ 3. `sfPropelEvents::registerListeners()`
+
+Use of the third method would look something like this, in your plugin's `config.php` file:
+
+{{{
+#!php
+<?php
+
+sfPropelEvents::registerListeners('my_behavior', array(
+  'method_not_found' => array(
+    array('myBehavior', 'listenForMethodNotFound'),
+  ),
+  'pre_save' => array(
+    array('myBehavior', 'listenForPreSave'),
+  ),
+));
+}}}
+
+A user of your plugin can now add this behavior to a model class. This works slightly different in symfony 1.0 and symfony 1.1.
+
+=== Adding behaviors in symfony 1.1 ===
+
+Adding the behavior to `schema.yml` will also activate these event listeners. In other words, users don't need to do anything special to install your plugin if they're using symfony 1.1.
+
+{{{
+#!yaml
+classes:
+  Item:
+    columns:
+      id: ~
+      # more columns...
+    behaviors:
+      my_behavior:
+        param1: foobar
+}}}
+
+=== Adding behaviors in symfony 1.0 ===
+
+In symfony 1.0, users will need to call `sfPropelEvents::addBehaviors()` in place of `sfPropelBehavior::add()`. For example:
+
+{{{
+#!php
+<?php
+
+class Item extends BaseItem
+{
+}
+
+sfPropelEvents::addBehaviors('Item', array(
+  'my_behavior' => array('param1' => 'foobar'),
+));
+}}}
+
+'''Note:''' This plugin has not been tested alongside [wiki:sfPropelAlternativeSchemaPlugin] in symfony 1.0.
+
+=== Testing the dependency ===
+
+If your plugin depends on Propel events, include the following code in `config/config.php`:
+
+{{{
+#!php
+<?php
+
+if (!class_exists('sfPropelEvents'))
+{
+  throw new sfException('sfFoobarPlugin requires that sfPropelEventsPlugin be installed.');
+}
+}}}
 
 == Maintainers ==
 
@@ -64,15 +130,21 @@ Kris Wallsmith
 == Roadmap ==
 
  * Peer events
- * Backport to symfony 1.0
+ * Play nice with [wiki:sfPropelAlternativeSchemaPlugin] (symfony 1.0)
 
 == Changelog ==
+
+=== Version 0.2.0-alpha ===
+
+ * Added symfony 1.0 support
 
 === Version 0.1.0-alpha ===
 
  * Initial release
 
-== Event Reference ==
+-----
+
+== Event reference ==
 
 Each event will include a set of parameters specific to that event. Also, each event object will elicit different reactions from the object once it returns, depending on the return value set by your listener.
 

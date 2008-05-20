@@ -3,8 +3,12 @@
 include dirname(__FILE__).'/../../bootstrap/functional.php';
 
 // create a new test browser
-$b = new sfTestBrowser();
-$t = $b->test();
+$b = new sfTestBrowser;
+if (is_null($t = $b->test()))
+{
+  $b->initialize();
+  $t = $b->test();
+}
 
 $b->getAndCheck('item', 'delete');
 

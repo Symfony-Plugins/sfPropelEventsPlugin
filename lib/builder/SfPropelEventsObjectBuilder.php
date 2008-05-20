@@ -1,5 +1,10 @@
 <?php
 
+if (!class_exists('SfObjectBuilder'))
+{
+  require_once sfConfig::get('sf_symfony_lib_dir').'/addon/propel/builder/SfObjectBuilder.php';
+}
+
 /**
  * Add events to Propel OM classes.
  * 
@@ -28,7 +33,7 @@ class SfPropelEventsObjectBuilder extends SfObjectBuilder
     // pre_delete
     $preDelete = <<<EOF
 
-    \$dispatcher = sfContext::getInstance()->getEventDispatcher();
+    \$dispatcher = sfPropelEvents::getEventDispatcher();
     \$event = \$dispatcher->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.pre_delete', array(
       'connection'        => \$con,
       'modified_columns'  => \$this->modifiedColumns,
@@ -76,7 +81,7 @@ EOF;
     // pre_save
     $preSave = <<<EOF
 
-    \$dispatcher = sfContext::getInstance()->getEventDispatcher();
+    \$dispatcher = sfPropelEvents::getEventDispatcher();
     \$wasNew = \$this->isNew();
     \$modifiedColumns = \$this->modifiedColumns;
     \$event = \$dispatcher->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.pre_save', array(
@@ -122,7 +127,7 @@ EOF;
     
     $call = <<<EOF
 
-    \$event = sfContext::getInstance()->getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.method_not_found', array(
+    \$event = sfPropelEvents::getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.method_not_found', array(
       'method'            => \$method,
       'arguments'         => \$arguments,
       'modified_columns'  => \$this->modifiedColumns,
@@ -160,7 +165,7 @@ EOF;
     // set_fk
     $setFk = <<<EOF
 
-    \$event = sfContext::getInstance()->getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.set_fk', array(
+    \$event = sfPropelEvents::getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.set_fk', array(
       'column'            => '$localColumn',
       'related_class'     => '{$this->getForeignTable($fk)->getPhpName()}',
       'old_value'         => \$this->{$this->getFKVarName($fk)},
@@ -200,7 +205,7 @@ EOF;
     // get_fk
     $getFk = <<<EOF
 
-    \$event = sfContext::getInstance()->getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.get_fk', array(
+    \$event = sfPropelEvents::getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.get_fk', array(
       'connection'        => \$con,
       'column'            => '{$localColumn}',
       'related_class'     => '{$this->getForeignTable($fk)->getPhpName()}',
@@ -237,7 +242,7 @@ EOF;
     
     $getFksJoin = <<<EOF
 
-    \$event = sfContext::getInstance()->getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.get_fks_join', array(
+    \$event = sfPropelEvents::getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.get_fks_join', array(
       'criteria'          => \$criteria,
       'connection'        => \$con,
       'middle_class'      => '{$refFK->getTable()->getPhpName()}',
@@ -289,7 +294,7 @@ EOF;
     // init_fk_coll
     $initFkColl = <<<EOF
 
-    \$event = sfContext::getInstance()->getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.init_fk_coll', array(
+    \$event = sfPropelEvents::getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.init_fk_coll', array(
       'related_class'     => '{$this->getRefFKPhpNameAffix($refFK, $plural = false)}',
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
       'last_criteria'     => \$this->{$this->getRefFKLastCriteriaVarName($refFK)},
@@ -327,7 +332,7 @@ EOF;
     // add_fk
     $addFk = <<<EOF
 
-    \$event = sfContext::getInstance()->getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.add_fk', array(
+    \$event = sfPropelEvents::getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.add_fk', array(
       'related_class'     => '{$this->getRefFKPhpNameAffix($refFK, $plural = false)}',
       'added_value'       => \$l,
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
@@ -365,7 +370,7 @@ EOF;
     // count_fks
     $countFks = <<<EOF
 
-    \$event = sfContext::getInstance()->getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.count_fks', array(
+    \$event = sfPropelEvents::getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.count_fks', array(
       'criteria'          => \$criteria,
       'distinct'          => \$distinct,
       'connection'        => \$con,
@@ -405,7 +410,7 @@ EOF;
     // get_fks
     $getFks = <<<EOF
 
-    \$event = sfContext::getInstance()->getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.get_fks', array(
+    \$event = sfPropelEvents::getEventDispatcher()->notifyUntil(new sfEvent(\$this, 'Base{$this->getTable()->getPhpName()}.get_fks', array(
       'criteria'          => \$criteria,
       'connection'        => \$con,
       'related_class'     => '{$this->getRefFKPhpNameAffix($refFK, $plural = false)}',
