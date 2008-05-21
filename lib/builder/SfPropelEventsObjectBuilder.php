@@ -82,9 +82,10 @@ EOF;
     // pre_delete
     $preDelete = <<<EOF
 
+    \$arguments = func_get_args();
     \$dispatcher = sfPropelEventsToolkit::getEventDispatcher();
     \$event = \$dispatcher->notifyUntil(new sfPropelEvent(\$this, 'Base{$this->getTable()->getPhpName()}.pre_delete', array(
-      'connection'        => \$con,
+      'arguments'         => \$arguments,
       'modified_columns'  => \$this->modifiedColumns,
     )));
     if (\$this->processEvent(\$event) && \$event->getReturnValue())
@@ -100,7 +101,7 @@ EOF;
     $postDelete = <<<EOF
 
     \$dispatcher->notify(new sfPropelEvent(\$this, 'Base{$this->getTable()->getPhpName()}.post_delete', array(
-      'connection'        => \$con,
+      'arguments'         => \$arguments,
       'modified_columns'  => \$this->modifiedColumns,
     )));
     
@@ -130,11 +131,12 @@ EOF;
     // pre_save
     $preSave = <<<EOF
 
+    \$arguments = func_get_args();
     \$dispatcher = sfPropelEventsToolkit::getEventDispatcher();
     \$wasNew = \$this->isNew();
     \$modifiedColumns = \$this->modifiedColumns;
     \$event = \$dispatcher->notifyUntil(new sfPropelEvent(\$this, 'Base{$this->getTable()->getPhpName()}.pre_save', array(
-      'connection'        => \$con,
+      'arguments'         => \$arguments,
       'modified_columns'  => \$modifiedColumns,
     )));
     if (\$this->processEvent(\$event) && is_int(\$event->getReturnValue()))
@@ -150,7 +152,7 @@ EOF;
     $postSave = <<<EOF
 
     \$dispatcher->notify(new sfPropelEvent(\$this, 'Base{$this->getTable()->getPhpName()}.post_save', array(
-      'connection'        => \$con,
+      'arguments'         => \$arguments,
       'was_new'           => \$wasNew,
       'affected_rows'     => \$affectedRows,
       'modified_columns'  => \$modifiedColumns,
@@ -236,11 +238,12 @@ EOF;
     // set_fk
     $setFk = <<<EOF
 
+    \$arguments = func_get_args();
     \$event = sfPropelEventsToolkit::getEventDispatcher()->notifyUntil(new sfPropelEvent(\$this, 'Base{$this->getTable()->getPhpName()}.set_fk', array(
+      'arguments'         => \$arguments,
       'column'            => '$localColumn',
       'related_class'     => '{$this->getForeignTable($fk)->getPhpName()}',
       'old_value'         => \$this->{$this->getFKVarName($fk)},
-      'new_value'         => \$v,
       'modified_columns'  => \$this->modifiedColumns,
     )));
     if (\$this->processEvent(\$event) && (is_null(\$event->getReturnValue()) || \$event->getReturnValue() instanceof {$this->getForeignTable($fk)->getPhpName()}))
@@ -276,8 +279,9 @@ EOF;
     // get_fk
     $getFk = <<<EOF
 
+    \$arguments = func_get_args();
     \$event = sfPropelEventsToolkit::getEventDispatcher()->notifyUntil(new sfPropelEvent(\$this, 'Base{$this->getTable()->getPhpName()}.get_fk', array(
-      'connection'        => \$con,
+      'arguments'         => \$arguments,
       'column'            => '{$localColumn}',
       'related_class'     => '{$this->getForeignTable($fk)->getPhpName()}',
       'in_object'         => \$this->{$this->getFKVarName($fk)},
@@ -313,9 +317,9 @@ EOF;
     
     $getFksJoin = <<<EOF
 
+    \$arguments = func_get_args();
     \$event = sfPropelEventsToolkit::getEventDispatcher()->notifyUntil(new sfPropelEvent(\$this, 'Base{$this->getTable()->getPhpName()}.get_fks_join', array(
-      'criteria'          => \$criteria,
-      'connection'        => \$con,
+      'arguments'         => \$arguments,
       'middle_class'      => '{$refFK->getTable()->getPhpName()}',
       'related_class'     => '%s',
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
@@ -365,7 +369,9 @@ EOF;
     // init_fk_coll
     $initFkColl = <<<EOF
 
+    \$arguments = func_get_args();
     \$event = sfPropelEventsToolkit::getEventDispatcher()->notifyUntil(new sfPropelEvent(\$this, 'Base{$this->getTable()->getPhpName()}.init_fk_coll', array(
+      'arguments'         => \$arguments,
       'related_class'     => '{$refFK->getTable()->getPhpName()}',
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
       'last_criteria'     => \$this->{$this->getRefFKLastCriteriaVarName($refFK)},
@@ -403,9 +409,10 @@ EOF;
     // add_fk
     $addFk = <<<EOF
 
+    \$arguments = func_get_args();
     \$event = sfPropelEventsToolkit::getEventDispatcher()->notifyUntil(new sfPropelEvent(\$this, 'Base{$this->getTable()->getPhpName()}.add_fk', array(
+      'arguments'         => \$arguments,
       'related_class'     => '{$refFK->getTable()->getPhpName()}',
-      'added_value'       => \$l,
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
       'last_criteria'     => \$this->{$this->getRefFKLastCriteriaVarName($refFK)},
       'modified_columns'  => \$this->modifiedColumns,
@@ -441,10 +448,9 @@ EOF;
     // count_fks
     $countFks = <<<EOF
 
+    \$arguments = func_get_args();
     \$event = sfPropelEventsToolkit::getEventDispatcher()->notifyUntil(new sfPropelEvent(\$this, 'Base{$this->getTable()->getPhpName()}.count_fks', array(
-      'criteria'          => \$criteria,
-      'distinct'          => \$distinct,
-      'connection'        => \$con,
+      'arguments'         => \$arguments,
       'related_class'     => '{$refFK->getTable()->getPhpName()}',
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
       'last_criteria'     => \$this->{$this->getRefFKLastCriteriaVarName($refFK)},
@@ -481,9 +487,9 @@ EOF;
     // get_fks
     $getFks = <<<EOF
 
+    \$arguments = func_get_args();
     \$event = sfPropelEventsToolkit::getEventDispatcher()->notifyUntil(new sfPropelEvent(\$this, 'Base{$this->getTable()->getPhpName()}.get_fks', array(
-      'criteria'          => \$criteria,
-      'connection'        => \$con,
+      'arguments'         => \$arguments,
       'related_class'     => '{$refFK->getTable()->getPhpName()}',
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
       'last_criteria'     => \$this->{$this->getRefFKLastCriteriaVarName($refFK)},
