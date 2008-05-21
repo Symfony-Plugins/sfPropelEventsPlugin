@@ -18,6 +18,12 @@ $t->ok($b->getRequest()->getAttribute('isNew'), 'pre_save ok');
 $b->getAndCheck('item', 'methodNotFound');
 $t->is($b->getRequest()->getAttribute('returnValue'), 'BaseItem.method_not_found', 'method_not_found ok');
 
+$b->getAndCheck('item', 'setCollection');
+$t->is_deeply($b->getRequest()->getAttribute('returnValue'), array(1, 2, 3), 'modification of collection ok');
+
+$b->getAndCheck('item', 'getCollection');
+$t->is_deeply($b->getRequest()->getAttribute('returnValue'), array(1, 2, 3), 'retrieval of collection ok');
+
 $b->getAndCheck('item', 'setFk');
 $t->is($b->getRequest()->getAttribute('person_id'), null, 'set_fk ok');
 

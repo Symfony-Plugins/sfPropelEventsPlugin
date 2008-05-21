@@ -1,17 +1,16 @@
 <?php
 
 /**
- * Utility class for sfPropelEventsPlugin.
+ * Behavior class for sfPropelEventsPlugin.
  * 
  * @package     sfPropelEventsPlugin
- * @subpackage  util
+ * @subpackage  behavior
  * @author      Kris Wallsmith <kris [dot] wallsmith [at] gmail [dot] com>
  * @version     SVN: $Id$
  */
-class sfPropelEvents
+class sfPropelEventsBehavior
 {
   protected static
-    $dispatcher     = null,
     $behaviors      = array(),
     $addedBehaviors = array();
   
@@ -21,7 +20,7 @@ class sfPropelEvents
    * @param   string $class A Propel OM class
    * @param   array $behaviors An array of behaviors and parameters
    */
-  public static function addBehaviors($class, $behaviors)
+  public static function add($class, $behaviors)
   {
     foreach ($behaviors as $name => $parameters)
     {
@@ -37,7 +36,7 @@ class sfPropelEvents
         {
           foreach ($listeners as $listener)
           {
-            self::getEventDispatcher()->connect('Base'.$class.'.'.$propelEvent, $listener);
+            sfPropelEventsToolkit::getEventDispatcher()->connect('Base'.$class.'.'.$propelEvent, $listener);
           }
         }
       }
@@ -62,7 +61,7 @@ class sfPropelEvents
    * 
    * @return  boolean
    */
-  public static function hasBehavior($class, $behavior)
+  public static function has($class, $behavior)
   {
     return isset(self::$addedBehaviors[$class]) && in_array($behavior, self::$addedBehaviors[$class]);
   }
@@ -81,7 +80,7 @@ class sfPropelEvents
       
       // make sure this behavior is also registered in sfPropelBehavior
       sfPropelBehavior::registerMethods($name, array(
-        array('sfPropelEvents', 'sfPropelEventsEmptyFunction'),
+        array('sfPropelEventsToolkit', 'sfPropelEventsEmptyFunction'),
       ));
     }
     
@@ -97,35 +96,5 @@ class sfPropelEvents
         self::$behaviors[$name][$propelEvent][] = $callable;
       }
     }
-  }
-  
-  /**
-   * An empty function.
-   */
-  public function sfPropelEventsEmptyFunction()
-  {
-  }
-  
-  /**
-   * Get the event dispatcher.
-   * 
-   * @return  sfEventDispatcher
-   */
-  public static function getEventDispatcher()
-  {
-    if (is_null(self::$dispatcher))
-    {
-      $context = sfContext::getInstance();
-      if (method_exists($context, 'getEventDispatcher'))
-      {
-        self::$dispatcher = $context->getEventDispatcher();
-      }
-      else
-      {
-        self::$dispatcher = new sfEventDispatcher;
-      }
-    }
-    
-    return self::$dispatcher;
   }
 }

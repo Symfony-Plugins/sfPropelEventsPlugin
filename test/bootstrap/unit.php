@@ -26,6 +26,7 @@ else
 }
 
 require_once $sf_symfony_lib_dir.'/vendor/lime/lime.php';
+require_once dirname(__FILE__).'/../../lib/util/sfPropelEventsToolkit.class.php';
 
 $t = new lime_test($nb, new lime_output_color);
 

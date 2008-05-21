@@ -10,10 +10,10 @@
     <email>kris.wallsmith@gmail.com</email>
     <active>yes</active>
   </lead>
-  <date>2008-05-20</date>
+  <date>2008-05-21</date>
   <version>
-    <release>0.2.0</release>
-    <api>0.2.0</api>
+    <release>0.3.0</release>
+    <api>0.3.0</api>
   </version>
   <stability>
     <release>alpha</release>
@@ -24,14 +24,22 @@
   <contents>
     <dir name="/">
       <dir name="lib">
+        <dir name="behavior">
+          <file role="data" name="sfPropelEventsBehavior.class.php" />
+        </dir>
         <dir name="builder">
           <file role="data" name="SfPropelEventsObjectBuilder.php"/>
           <file role="data" name="SfPropelEventsPeerBuilder.php"/>
         </dir>
-        <file role="data" name="sfPropelEvents.class.php"/>
         <dir name="event">
-          <file role="data" name="sfEvent.class.php"/>
-          <file role="data" name="sfEventDispatcher.class.php"/>
+          <dir name="symfony">
+            <file role="data" name="sfEvent.class.php" />
+            <file role="data" name="sfEventDispatcher.class.php" />
+          </dir>
+          <file role="data" name="sfPropelEvent.class.php" />
+        </dir>
+        <dir name="util">
+          <file role="data" name="sfPropelEventsToolkit.class.php" />
         </dir>
       </dir>
       <file role="data" name="LICENSE"/>

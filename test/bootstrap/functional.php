@@ -46,5 +46,5 @@ else
 }
 
 require_once $sf_symfony_lib_dir.'/vendor/lime/lime.php';
-require_once dirname(__FILE__).'/../fixtures/sfPropelEventsTest.class.php';
+require_once dirname(__FILE__).'/../fixtures/sfPropelEventsBehaviorTest.class.php';
 require_once dirname(__FILE__).'/../fixtures/myTestBehavior.class.php';

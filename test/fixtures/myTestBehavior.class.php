@@ -28,7 +28,18 @@ class myTestBehavior
   
   public static function listenForMethodNotFound(sfEvent $event)
   {
-    $event->setReturnValue($event->getName());
+    switch ($event['method'])
+    {
+      case 'getCollection':
+        $event->setReturnValue($event['collections'][$event['arguments'][0]]);
+        break;
+      case 'setCollection':
+        $event->modifyObject($event['arguments'][0], $event['arguments'][1]);
+        $event->setReturnValue($event['arguments'][1]);
+        break;
+      default:
+        $event->setReturnValue($event->getName());
+    }
     
     return true;
   }
@@ -83,7 +94,7 @@ class myTestBehavior
   }
 }
 
-sfPropelEvents::registerListeners('test_behavior', array(
+sfPropelEventsBehavior::registerListeners('test_behavior', array(
   'pre_delete' => array(
     array('myTestBehavior', 'listenForPreDelete'),
   ),

@@ -40,7 +40,7 @@ class SfPropelEventsPeerBuilder extends SfPeerBuilder
       $addBehaviors = <<<EOF
 <?php
 
-sfPropelEvents::addBehaviors('{$this->getTable()->getPhpName()}', $behaviors);
+sfPropelEventsBehavior::add('{$this->getTable()->getPhpName()}', $behaviors);
 
 EOF;
       file_put_contents($absolute_behavior_file_path, $addBehaviors);

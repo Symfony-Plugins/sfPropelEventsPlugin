@@ -1,10 +1,10 @@
 = sfPropelEventsPlugin =
 
-Adds a number of symfony 1.1 events to your Propel objects (compatible with both symfony 1.0 and 1.1).
+Add a number of symfony 1.1 events to your Propel objects (compatible with both symfony 1.0 and 1.1).
 
 == Installation ==
 
-To download the plugin over the symfony PEAR channel:
+Download the plugin over the symfony PEAR channel:
 
 {{{
 $ ./symfony plugin-install sfPropelEventsPlugin
@@ -13,8 +13,8 @@ $ ./symfony plugin-install sfPropelEventsPlugin
 Update the following two directive in your project's `propel.ini` file:
 
 {{{
-propel.builder.peer.class              = plugins.sfPropelEventsPlugin.lib.builder.SfPropelEventsPeerBuilder
-propel.builder.object.class            = plugins.sfPropelEventsPlugin.lib.builder.SfPropelEventsObjectBuilder
+propel.builder.peer.class   = plugins.sfPropelEventsPlugin.lib.builder.SfPropelEventsPeerBuilder
+propel.builder.object.class = plugins.sfPropelEventsPlugin.lib.builder.SfPropelEventsObjectBuilder
 }}}
 
 Also in `propel.ini`, make sure the `addBehaviors` directive is switched on:
@@ -52,7 +52,7 @@ All of these events can be utilized in Propel behaviors. For the purpose of this
 
  1. `sfPropelBehavior::registerHooks()`
  2. `sfPropelBehavior::registerMethods()`
- 3. `sfPropelEvents::registerListeners()`
+ 3. `sfPropelEventsBehavior::registerListeners()`
 
 Use of the third method would look something like this, in your plugin's `config.php` file:
 
@@ -60,7 +60,7 @@ Use of the third method would look something like this, in your plugin's `config
 #!php
 <?php
 
-sfPropelEvents::registerListeners('my_behavior', array(
+sfPropelEventsBehavior::registerListeners('my_behavior', array(
   'method_not_found' => array(
     array('myBehavior', 'listenForMethodNotFound'),
   ),
@@ -68,6 +68,29 @@ sfPropelEvents::registerListeners('my_behavior', array(
     array('myBehavior', 'listenForPreSave'),
   ),
 ));
+}}}
+
+=== Modifying protected variables ===
+
+If you want to modify a protected member of a Propel object, you can do this by calling the `modifyObject()` method on the event object (a method of `sfPropelEvent`).
+
+{{{
+#!php
+<?php
+
+class myBehavior
+{
+  static public function listenForMethodNotFound(sfPropelEvent $event)
+  {
+    switch ($event['method'])
+    {
+      // ->setProtectedVar(string $varName, mixed $value)
+      case 'setProtectedVar':
+        $event->modifyObject($event['arguments'][0], $event['arguments'][1]);
+        return true;
+    }
+  }
+}
 }}}
 
 A user of your plugin can now add this behavior to a model class. This works slightly different in symfony 1.0 and symfony 1.1.
@@ -90,7 +113,7 @@ classes:
 
 === Adding behaviors in symfony 1.0 ===
 
-In symfony 1.0, users will need to call `sfPropelEvents::addBehaviors()` in place of `sfPropelBehavior::add()`. For example:
+In symfony 1.0, users will need to call `sfPropelEventsBehavior::add()` in place of `sfPropelBehavior::add()`. For example:
 
 {{{
 #!php
@@ -100,7 +123,7 @@ class Item extends BaseItem
 {
 }
 
-sfPropelEvents::addBehaviors('Item', array(
+sfPropelEventsBehavior::add('Item', array(
   'my_behavior' => array('param1' => 'foobar'),
 ));
 }}}
@@ -115,7 +138,7 @@ If your plugin depends on Propel events, include the following code in `config/c
 #!php
 <?php
 
-if (!class_exists('sfPropelEvents'))
+if (!class_exists('sfPropelEvent'))
 {
   throw new sfException('sfFoobarPlugin requires that sfPropelEventsPlugin be installed.');
 }
@@ -131,6 +154,11 @@ Kris Wallsmith
  * Play nice with [wiki:sfPropelAlternativeSchemaPlugin] (symfony 1.0)
 
 == Changelog ==
+
+=== Version 0.3.0-alpha ===
+
+ * All internal collections, foreign key objects, and last-used criteria are now exposed to the `method_not_found` event
+ * Propel objects now dispatch `sfPropelEvent` objects, which can carry modifications to protected BaseXXX members
 
 === Version 0.2.0-alpha ===
 
