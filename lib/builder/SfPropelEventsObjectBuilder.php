@@ -234,6 +234,7 @@ EOF;
     parent::addFKMutator($tmp, $fk);
     
     $localColumn = array_shift($fk->getLocalColumns());
+    $localColumnUpper = strtoupper($localColumn);
     
     // set_fk
     $setFk = <<<EOF
@@ -257,6 +258,15 @@ EOF;
     
     $pos = strpos($tmp, '{') + 1;
     $tmp = substr($tmp, 0, $pos).$setFk.substr($tmp, $pos);
+    
+    // modified columns bugfix
+    $bugfix = <<<EOF
+else {
+			if (\$v->isNew()) {
+			  \$this->modifiedColumns[] = {$this->getColumnConstant($this->getTable()->getColumn($localColumn))};
+			}
+EOF;
+    $tmp = str_replace('else {', $bugfix, $tmp);
     
     $script .= $tmp;
   }
