@@ -167,6 +167,19 @@ EOF;
   }
   
   /**
+   * @see PHP5ComplexObjectBuilder
+   */
+  protected function addDoSave(& $script)
+	{
+	  $tmp = '';
+	  parent::addDoSave($tmp);
+	  
+	  $tmp = preg_replace('/if \(\$this\-\>(a\w+)\-\>isModified\(\)\)/', 'if ($this->\\1->isModified() || $this->\\1->isNew())', $tmp);
+	  
+	  $script .= $tmp;
+	}
+  
+  /**
    * Add dispatch of BaseXXX.method_not_found event.
    * 
    * @see SfObjectBuilder
@@ -258,15 +271,6 @@ EOF;
     
     $pos = strpos($tmp, '{') + 1;
     $tmp = substr($tmp, 0, $pos).$setFk.substr($tmp, $pos);
-    
-    // modified columns bugfix
-    $bugfix = <<<EOF
-else {
-			if (\$v->isNew()) {
-			  \$this->modifiedColumns[] = {$this->getColumnConstant($this->getTable()->getColumn($localColumn))};
-			}
-EOF;
-    $tmp = str_replace('else {', $bugfix, $tmp);
     
     $script .= $tmp;
   }
