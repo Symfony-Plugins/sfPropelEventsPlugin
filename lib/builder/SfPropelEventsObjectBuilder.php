@@ -436,6 +436,7 @@ EOF;
       'method'            => __FUNCTION__,
       'arguments'         => \$arguments,
       'related_class'     => '{$refFK->getTable()->getPhpName()}',
+      'related_setter'    => 'set{$this->getFKPhpNameAffix($refFK, $plural = false)}',
       'in_object'         => \$this->{$this->getRefFKCollVarName($refFK)},
       'in_object_var'     => '{$this->getRefFKCollVarName($refFK)}',
       'last_criteria'     => \$this->{$this->getRefFKLastCriteriaVarName($refFK)},
