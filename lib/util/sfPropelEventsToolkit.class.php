@@ -22,10 +22,9 @@ class sfPropelEventsToolkit
   {
     if (is_null(self::$dispatcher))
     {
-      $context = sfContext::getInstance();
-      if (method_exists($context, 'getEventDispatcher'))
+      if (class_exists('ProjectConfiguration'))
       {
-        self::$dispatcher = $context->getEventDispatcher();
+        self::$dispatcher = ProjectConfiguration::getActive()->getEventDispatcher();
       }
       else
       {

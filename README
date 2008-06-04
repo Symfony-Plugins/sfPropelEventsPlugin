@@ -155,6 +155,13 @@ Kris Wallsmith
 
 == Changelog ==
 
+=== Version 0.4.0-alpha ===
+
+ * Nested all method arguments in an `arguments` event parameter
+ * Added parameters to FK methods
+ * Modified `->doSave()` logic to address Propel cascading save bug
+ * Addressed bug in how `sfPropelEventsToolkit` fetches the dispatcher
+
 === Version 0.3.0-alpha ===
 
  * All internal collections, foreign key objects, and last-used criteria are now exposed to the `method_not_found` event
@@ -178,7 +185,7 @@ Each event will include a set of parameters specific to that event. Also, each e
 
 This `notifyUntil` event includes the following parameters:
 
- * `connection`
+ * `arguments`
  * `modified_columns`
 
 If your listener sets a return value for the event that evaluates as true, the standard Propel delete routine will not run.
@@ -199,14 +206,14 @@ function listen_for_pre_delete(sfEvent $event)
 
 This `notify` event includes the following parameters:
 
- * `connection`
+ * `arguments`
  * `modified_columns`
 
 === `pre_save` ===
 
 This `notifyUntil` event includes the following parameters:
 
- * `connection`
+ * `arguments`
  * `modified_columns`
 
 If your listener gives the event an integer return value, the standard Propel save routing will not run.
@@ -227,7 +234,7 @@ function listen_for_pre_save(sfEvent $event)
 
 This `notify` event includes the following parameters:
 
- * `connection`
+ * `arguments`
  * `was_new` whether the object was new before being saved
  * `affected_rows`
  * `modified_columns` those columns marked as modifed before the object was saved
@@ -238,6 +245,9 @@ This `notifyUntil` event includes the following parameters:
 
  * `method`
  * `arguments`
+ * `fk_objects`
+ * `collections`
+ * `last_criteria`
  * `modified_columns`
 
 {{{
@@ -260,10 +270,12 @@ function listen_for_method_not_found(sfEvent $event)
 
 This `notifyUntil` event includes the following parameters:
 
+ * `method`
+ * `arguments`
  * `column`
  * `related_class`
- * `old_value`
- * `new_value`
+ * `in_object`
+ * `in_object_var`
  * `modified_columns`
 
 If your listener gives the event a return value of `null` or an instance of the `related_class`, the return value will be stored to the object.
@@ -284,10 +296,12 @@ function listen_for_set_fk(sfEvent $event)
 
 This `notifyUntil` event includes the following parameters:
 
- * `connection`
+ * `method`
+ * `arguments`
  * `column`
  * `related_class`
  * `in_object` The instance of `related_class` or `null` currently stored in the object
+ * `in_object_var`
  * `modified_columns`
 
 If your listener gives the event a return value of `null` or an instance of the `related_class`, the event's return value will be returned to the calling script.
@@ -310,8 +324,11 @@ function listen_for_get_fk(sfEvent $event)
 
 This `notifyUntil` event includes the following parameters:
 
+ * `method`
+ * `arguments`
  * `related_class`
  * `in_object` The current value of the internal FK collection
+ * `in_object_var`
  * `last_criteria` The last Criteria used to query this FK
  * `modified_columns`
 
@@ -321,9 +338,12 @@ If your listener gives the event an array return value, the object's internal co
 
 This `notifyUntil` event includes the following parameters:
 
+ * `method`
+ * `arguments`
  * `related_class`
  * `added_value`
  * `in_object` The internal FK collection
+ * `in_object_var`
  * `last_criteria` The last Criteria used to query this FK
  * `modified_columns`
 
@@ -333,11 +353,11 @@ If your listener sets a return value for the event that evaluates as true, the s
 
 This `notifyUntil` event includes the following parameters:
 
- * `criteria`
- * `distinct`
- * `connection`
+ * `method`
+ * `arguments`
  * `related_class`
  * `in_object` The internal FK collection
+ * `in_object_var`
  * `last_criteria` The last Criteria used to query this FK
  * `modified_columns`
 
@@ -347,10 +367,11 @@ If your listener sets an integer return value for the event, this value will be 
 
 This `notifyUntil` event includes the following parameters:
 
- * `criteria`
- * `connection`
+ * `method`
+ * `arguments`
  * `related_class`
  * `in_object` The internal FK collection
+ * `in_object_var`
  * `last_criteria` The last Criteria used to query this FK
  * `modified_columns`
 
@@ -360,15 +381,13 @@ If your listener sets an array return value for the event, this value will be re
 
 This `notifyUntil` event includes the following parameters:
 
- * `criteria`
- * `connection`
+ * `method`
+ * `arguments`
  * `middle_class`
  * `related_class`
  * `in_object`
+ * `in_object_var`
  * `last_criteria`
  * `modified_columns`
 
 If your listener sets an array return value for the event, this value will be returned to the calling script in place of Propel's default behavior.
-
-
-
